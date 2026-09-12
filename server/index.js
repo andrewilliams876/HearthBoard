@@ -23,6 +23,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicPath = path.resolve(__dirname, "..", "dist");
 const port = Number(process.env.PORT ?? 3000);
 const host = process.env.HOST ?? "0.0.0.0";
+const trustProxy = ["true", "1", "yes", "on"].includes(String(process.env.TRUST_PROXY ?? "false").trim().toLowerCase());
 
 const categories = new Set(["AI", "Infrastructure", "Media", "Network", "Security"]);
 const checkTypes = new Set(["HTTP", "Ping", "TCP", "None"]);
@@ -38,12 +39,19 @@ seedDatabase();
 
 const app = Fastify({
   logger: true,
-  trustProxy: true,
+  trustProxy,
 });
 
 await app.register(rateLimit, {
   max: Number(process.env.RATE_LIMIT_MAX ?? 120),
   timeWindow: process.env.RATE_LIMIT_WINDOW ?? "1 minute",
+});
+
+app.addHook("onSend", async (_request, reply, payload) => {
+  reply.header("X-Content-Type-Options", "nosniff");
+  reply.header("Referrer-Policy", "no-referrer");
+  reply.header("X-Frame-Options", "DENY");
+  return payload;
 });
 
 function badRequest(message) {
