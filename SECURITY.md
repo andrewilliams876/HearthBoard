@@ -12,6 +12,7 @@ Please open a GitHub issue with enough detail to reproduce the problem. If the i
 
 - Authentication is not included yet.
 - Run the app on a trusted LAN, behind a VPN, or behind an authenticated reverse proxy.
+- `TRUST_PROXY` is disabled by default; enable it only when the app is actually behind a reverse proxy you control.
 - Users who can access the dashboard can create health-check targets, which causes the backend container to make network requests.
 - Ping checks require Docker `NET_RAW`; remove that capability if you do not use Ping checks.
 - Internal/self-signed HTTPS checks may require `ALLOW_INSECURE_TLS=true`. Set it to `false` for stricter certificate validation.

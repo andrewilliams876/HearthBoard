@@ -135,6 +135,7 @@ Environment variables:
 | `PORT` | `3000` | HTTP port inside the container |
 | `HOST` | `0.0.0.0` | Bind address |
 | `DATABASE_PATH` | `/data/hearthboard.db` in Docker | SQLite database path |
+| `TRUST_PROXY` | `false` | Trust `X-Forwarded-*` headers only when running behind your own reverse proxy |
 | `HEALTH_TIMEOUT_MS` | `5000` | Per-check timeout |
 | `SLOW_THRESHOLD_MS` | `1500` | Response time considered slow |
 | `ALLOW_INSECURE_TLS` | `true` in compose | Allows self-signed/internal HTTPS certificates |
@@ -160,6 +161,8 @@ location / {
     proxy_set_header X-Forwarded-Proto $scheme;
 }
 ```
+
+If you run Hearthboard behind a reverse proxy, also set `TRUST_PROXY=true` so rate limiting and request metadata use the forwarded client IP safely.
 
 ## Development
 
@@ -213,6 +216,8 @@ Health checks can make outbound requests to hosts entered in the dashboard. Trea
 ICMP ping requires `NET_RAW` in Docker. Remove `cap_add: NET_RAW` if you do not need Ping checks.
 
 `ALLOW_INSECURE_TLS=true` is convenient for internal/self-signed services. Set it to `false` if you only monitor trusted public HTTPS certificates.
+
+`TRUST_PROXY` defaults to `false` to avoid trusting spoofed forwarded headers when the app is exposed directly. Only enable it when Hearthboard sits behind a reverse proxy you control.
 
 ## License
 
